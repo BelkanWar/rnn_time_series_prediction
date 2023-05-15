@@ -1,0 +1,11 @@
+__pycache__/
+*.pkl
+*.log
+*.json
+*.png
+*.pt
+.pytest_cache
+*.vscode
+*.pth
+*.metals
+*.csv
