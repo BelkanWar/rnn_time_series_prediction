@@ -10,8 +10,9 @@ import seaborn as sns
 
 # parameters
 TRAIN_LENGTH = 100
-LOOKBACK_LENGTH = 10
+LOOKBACK_LENGTH = 30
 EPOCH = 3000
+loss_fn = torch.nn.MSELoss()
 
 data = pd.read_csv("data/AirPassengers.csv")
 data['Month'] = pd.to_datetime(data['Month'], format='%Y-%m')
@@ -26,7 +27,7 @@ for idx in range(LOOKBACK_LENGTH+1, TRAIN_LENGTH):
 
 loader = utils.convert2Loader(data_X, data_Y)
 model = utils.continus_Model()
-model = utils.training(model, loader, EPOCH)
+model = utils.training(model, loader, loss_fn, EPOCH)
 
 
 with torch.inference_mode():
@@ -35,17 +36,17 @@ with torch.inference_mode():
         'type':['ground truth']*data.shape[0],
         'X':[i for i in range(data.shape[0])]}
     
-    series = data['#Passengers'].tolist()[:TRAIN_LENGTH]
+    series = data['#Passengers'].tolist()[:LOOKBACK_LENGTH]
     tensor = torch.tensor(series).reshape(1, -1, 1)
     predict = model(tensor).flatten().tolist()
     
     plot['value'] += predict
     plot['type'] += ['fit']*(len(predict)-1) + ['predict']
-    plot['X'] += [i for i in range(1, TRAIN_LENGTH+1)]
+    plot['X'] += [i for i in range(1, LOOKBACK_LENGTH+1)]
     series.append(predict[-1])
     
-    for X in range(TRAIN_LENGTH+1, data.shape[0]):
-        tensor = torch.tensor(series).reshape(1, -1, 1)
+    for X in range(LOOKBACK_LENGTH+1, data.shape[0]):
+        tensor = torch.tensor(series[-LOOKBACK_LENGTH:]).reshape(1, -1, 1)
         predict = model(tensor).flatten().tolist()
 
         plot['value'].append(predict[-1])

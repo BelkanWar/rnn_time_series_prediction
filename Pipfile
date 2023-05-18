@@ -13,6 +13,7 @@ torch = {index = "pytorch", version = "*"}
 numpy = "*"
 pandas = "*"
 seaborn = "*"
+scikit-learn = "*"
 
 [dev-packages]
 
